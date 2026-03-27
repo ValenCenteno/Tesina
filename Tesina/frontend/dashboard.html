@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Reporte - Río Tercero</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-map-marker-alt"></i> Reporte
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Inicio</a>
+        <a href="reportes-mapa.html">Mapa de Reportes</a>
+        <a href="panel-administracion.html">Panel de Administración</a>
+      </nav>
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Buscar...">
+        </div>
+        <a href="dashboard.html" class="btn btn-primary btn-sm active">Crear reporte</a>
+        <button class="btn btn-outline btn-sm" id="btnRegistro" onclick="showAuthModal('registro')">Registrarse</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Crear Reporte -->
+  <main class="section">
+    <div class="container">
+      <div class="form-card">
+        <h2 class="form-title">Crear Reporte</h2>
+        <form id="reportForm" class="report-form" onsubmit="handleCreateReport(event)">
+          <div class="form-grid">
+            <div class="form-left">
+              <div class="form-group">
+                <label for="tipo">Tipo de problema</label>
+                <select id="tipo" required>
+                  <option value="">Selecciona un tipo</option>
+                  <option value="Baches">Baches</option>
+                  <option value="Luminaria rota">Luminaria rota</option>
+                  <option value="Acumulación de basura">Acumulación de basura</option>
+                  <option value="Fuga de agua">Fuga de agua</option>
+                  <option value="Señalización dañada">Señalización dañada</option>
+                  <option value="Alcantarilla sin tapa">Alcantarilla sin tapa</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" placeholder="Título del reporte" required>
+              </div>
+              <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" placeholder="Describe el problema con detalle: ubicación exacta, gravedad, desde cuándo ocurre..." required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="direccion">Ubicación</label>
+                <input type="text" id="direccion" placeholder="Dirección o referencia en Río Tercero" required>
+              </div>
+              <div class="form-group">
+                <label for="imagen">Foto del problema</label>
+                <input type="file" id="imagen" accept="image/*">
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">Enviar Reporte</button>
+            </div>
+            <div class="form-right">
+              <label>Ubicación en el mapa</label>
+              <div id="map" class="map-container"></div>
+              <p class="map-hint">Haz clic en el mapa para seleccionar ubicación</p>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Inicializar mapa de Leaflet centrado en Río Tercero
+    const map = L.map('map').setView([-32.1733, -64.1133], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let marker = null;
+    const latInput = document.createElement('input');
+    latInput.type = 'hidden'; latInput.id = 'latitud';
+    const lngInput = document.createElement('input');
+    lngInput.type = 'hidden'; lngInput.id = 'longitud';
+    document.getElementById('reportForm').append(latInput, lngInput);
+
+    map.on('click', function(e) {
+      if (marker) map.removeLayer(marker);
+      marker = L.marker(e.latlng).addTo(map);
+      latInput.value = e.latlng.lat;
+      lngInput.value = e.latlng.lng;
+    });
+  </script>
+</body>
+</html>

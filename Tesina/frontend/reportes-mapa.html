@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Reportes - Río Tercero</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="reportes-mapa.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-map-marker-alt"></i> Reporte
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Inicio</a>
+        <a href="reportes-mapa.html" class="active">Mapa de Reportes</a>
+        <a href="panel-administracion.html">Panel de Administración</a>
+      </nav>
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Buscar..." id="searchReports" oninput="filterReports()">
+        </div>
+        <a href="dashboard.html" class="btn btn-primary btn-sm">Crear reporte</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout: Sidebar + Mapa -->
+  <div class="map-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Mapa de Reportes</h2>
+      </div>
+      <div class="sidebar-list" id="reportsList">
+        <!-- Se llena dinámicamente -->
+        <div class="report-item" data-id="1">
+          <img src="img/baches.jpg" alt="" class="report-thumb">
+          <div class="report-info">
+            <p class="report-title">Calle con baches</p>
+            <p class="report-address">Av. Sabattini 450, Río Tercero</p>
+            <span class="badge badge-warning">Pendiente</span>
+          </div>
+        </div>
+        <div class="report-item" data-id="2">
+          <img src="img/luminaria.jpg" alt="" class="report-thumb">
+          <div class="report-info">
+            <p class="report-title">Luminaria rota</p>
+            <p class="report-address">Av. San Martín 800, Río Tercero</p>
+            <span class="badge badge-primary">En progreso</span>
+          </div>
+        </div>
+        <div class="report-item" data-id="3">
+          <img src="img/basura.jpg" alt="" class="report-thumb">
+          <div class="report-info">
+            <p class="report-title">Acumulación de basura</p>
+            <p class="report-address">Barrio Sur, calle 9 de Julio</p>
+            <span class="badge badge-warning">Pendiente</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mapa -->
+    <div class="map-area">
+      <div id="map" class="full-map"></div>
+
+      <!-- Card de detalle -->
+      <div class="detail-card" id="detailCard" style="display:none;">
+        <div class="detail-row">
+          <img src="" alt="" class="detail-img" id="detailImg">
+          <div class="detail-info">
+            <h3 id="detailTitle"></h3>
+            <p id="detailDesc"></p>
+            <div class="detail-location">
+              <i class="fas fa-map-marker-alt"></i>
+              <span id="detailAddress"></span>
+            </div>
+            <span class="badge" id="detailBadge"></span>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-danger btn-sm">Reportar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Mapa centrado en Río Tercero
+    const map = L.map('map').setView([-32.1733, -64.1133], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Datos de ejemplo
+    const reportes = [
+      { id: 1, title: 'Calle con baches', desc: 'Calle en mal estado con múltiples baches.', address: 'Av. Sabattini 450, Río Tercero', lat: -32.1720, lng: -64.1150, status: 'Pendiente', img: 'img/baches.jpg' },
+      { id: 2, title: 'Luminaria rota', desc: 'Luminaria dañada que no enciende por las noches.', address: 'Av. San Martín 800, Río Tercero', lat: -32.1750, lng: -64.1100, status: 'En progreso', img: 'img/luminaria.jpg' },
+      { id: 3, title: 'Acumulación de basura', desc: 'Gran acumulación de basura en esquina.', address: 'Barrio Sur, calle 9 de Julio', lat: -32.1780, lng: -64.1180, status: 'Pendiente', img: 'img/basura.jpg' },
+    ];
+
+    const markers = {};
+    const statusColors = { 'Pendiente': '#f59e0b', 'En progreso': '#1d6fd3', 'Resuelto': '#22c55e' };
+
+    reportes.forEach(r => {
+      const color = statusColors[r.status] || '#888';
+      const icon = L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="background:${color};width:24px;height:24px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      const m = L.marker([r.lat, r.lng], { icon }).addTo(map);
+      m.on('click', () => showDetail(r));
+      markers[r.id] = m;
+    });
+
+    // Click en sidebar items
+    document.querySelectorAll('.report-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = parseInt(item.dataset.id);
+        const r = reportes.find(x => x.id === id);
+        if (r) {
+          showDetail(r);
+          map.setView([r.lat, r.lng], 16);
+        }
+      });
+    });
+
+    function showDetail(r) {
+      const card = document.getElementById('detailCard');
+      card.style.display = 'block';
+      document.getElementById('detailImg').src = r.img;
+      document.getElementById('detailTitle').textContent = r.title;
+      document.getElementById('detailDesc').textContent = r.desc;
+      document.getElementById('detailAddress').textContent = r.address;
+      const badge = document.getElementById('detailBadge');
+      badge.textContent = r.status;
+      badge.className = 'badge ' + (r.status === 'Pendiente' ? 'badge-warning' : r.status === 'En progreso' ? 'badge-primary' : 'badge-success');
+    }
+
+    function filterReports() {
+      const q = document.getElementById('searchReports').value.toLowerCase();
+      document.querySelectorAll('.report-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte - Río Tercero</title>
+  <link rel="stylesheet" href="index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-map-marker-alt"></i> Reporte
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="active">Inicio</a>
+        <a href="reportes-mapa.html">Mapa de Reportes</a>
+        <a href="panel-administracion.html">Panel de Administración</a>
+      </nav>
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Buscar..." id="searchInput">
+        </div>
+        <a href="dashboard.html" class="btn btn-primary btn-sm">Crear reporte</a>
+        <button class="btn btn-outline btn-sm" id="btnRegistro" onclick="showAuthModal('registro')">Registrarse</button>
+      </div>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <img src="img/hero-rio-tercero.jpg" alt="Río Tercero" class="hero-bg">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Reporta Problemas en tu Ciudad</h1>
+      <p>Ayuda a mejorar Río Tercero reportando problemas urbanos de forma rápida y sencilla</p>
+      <div class="hero-buttons">
+        <button class="btn btn-secondary btn-lg" onclick="showAuthModal('registro')">Registrarse</button>
+        <button class="btn btn-hero-outline btn-lg" onclick="showAuthModal('login')">Iniciar Sesión</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problemas recientes -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Problemas recientes</h2>
+      <div class="cards-grid" id="recentReports">
+        <div class="report-card">
+          <div class="card-image">
+            <img src="img/baches.jpg" alt="Calle con baches">
+          </div>
+          <div class="card-body">
+            <div class="card-header-row">
+              <h3>Calle con baches</h3>
+              <span class="badge badge-warning">Pendiente</span>
+            </div>
+            <p>Calle en mal estado con múltiples baches en Barrio Centro, Río Tercero.</p>
+          </div>
+        </div>
+        <div class="report-card">
+          <div class="card-image">
+            <img src="img/luminaria.jpg" alt="Luminaria rota">
+          </div>
+          <div class="card-body">
+            <div class="card-header-row">
+              <h3>Luminaria rota</h3>
+              <span class="badge badge-primary">En progreso</span>
+            </div>
+            <p>Luminaria dañada en Av. San Martín, zona insegura por las noches.</p>
+          </div>
+        </div>
+        <div class="report-card">
+          <div class="card-image">
+            <img src="img/basura.jpg" alt="Acumulación de basura">
+          </div>
+          <div class="card-body">
+            <div class="card-header-row">
+              <h3>Acumulación de basura</h3>
+              <span class="badge badge-warning">Pendiente</span>
+            </div>
+            <p>Gran acumulación de basura en esquina de Barrio Sur, Río Tercero.</p>
+          </div>
+        </div>
+      </div>
+      <div class="center-action">
+        <a href="reportes-mapa.html" class="btn btn-outline">Ver todos los reportes</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de Auth -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+      <h2 id="authTitle">Registrarse</h2>
+      <form id="authForm" onsubmit="handleAuth(event)">
+        <div class="form-group" id="nombreGroup">
+          <label for="authNombre">Nombre completo</label>
+          <input type="text" id="authNombre" placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label for="authEmail">Correo electrónico</label>
+          <input type="email" id="authEmail" placeholder="correo@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label for="authPassword">Contraseña</label>
+          <input type="password" id="authPassword" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">
+          <span id="authBtnText">Crear Cuenta</span>
+        </button>
+        <p class="auth-switch">
+          <span id="authSwitchText">¿Ya tienes cuenta?</span>
+          <a href="#" id="authSwitchLink" onclick="toggleAuthMode(event)">Inicia sesión</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
