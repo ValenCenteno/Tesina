@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CiudadActiva - Inicio</title>
+
+    <!-- CSS Global y específico -->
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/global.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-city"></i> CiudadActiva
+        </div>
+        <nav class="nav-buttons">
+            <a href="../html/index.html" class="btn btn-outline">Inicio</a>
+            <a href="../html/crear-reporte.html" class="btn btn-outline">Reportar</a>
+            <a href="../html/mapa.html" class="btn btn-outline">Mapa</a>
+            <a href="../html/admin.html" class="btn btn-outline">Admin</a>
+            <button class="btn btn-outline" id="loginBtn">Iniciar Sesión</button>
+            <button class="btn btn-primary" id="registerBtn">Registro</button>
+        </nav>
+        <button class="btn-mobile-toggle" id="mobileToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</header>
+
+<main class="container">
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Reporta problemas en Rio Tercero</h1>
+            <p class="hero-subtitle">Ayudá a mejorar la ciudad reportando problemas urbanos</p>
+            <div class="hero-buttons">
+                <a href="../html/crear-reporte.html" class="btn btn-primary btn-large">Crear Reporte</a>
+                <a href="../html/mapa.html" class="btn btn-outline btn-large">Ver Mapa</a>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-header">
+            <h2>Problemas recientes</h2>
+            <a href="../html/mapa.html" class="view-all">Ver todos</a>
+        </div>
+        <div class="problems-grid" id="recentProblems"></div>
+    </section>
+</main>
+
+<script src="../js/data.js"></script>
+<script src="../js/home.js"></script>
+</body>
+</html>
