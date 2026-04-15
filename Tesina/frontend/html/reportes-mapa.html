@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Reportes - Río Tercero</title>
+  <link rel="stylesheet" href="../css/index.css">
+  <link rel="stylesheet" href="../css/reportes-mapa.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <i class="fas fa-map-marker-alt"></i> Reporte
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Inicio</a>
+        <a href="reportes-mapa.html" class="active">Mapa de Reportes</a>
+        <a href="panel-administracion.html">Panel de Administración</a>
+      </nav>
+      <div class="header-actions">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Buscar reportes..." id="searchReports" oninput="filterReports()">
+        </div>
+        <a href="dashboard.html" class="btn btn-primary btn-sm">Crear reporte</a>
+        <a href="index.html" class="btn btn-outline btn-sm">
+          <i class="fas fa-home"></i> Inicio
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="map-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Mapa de Reportes</h2>
+        <!-- Buscador de dirección -->
+        <div class="address-search" style="margin-top: 12px;">
+          <input type="text" id="addressSearch" placeholder="Buscar dirección..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius);">
+          <button onclick="buscarDireccion()" class="btn btn-primary btn-sm" style="margin-top: 8px; width: 100%;">
+            <i class="fas fa-search-location"></i> Ir a dirección
+          </button>
+        </div>
+      </div>
+      <div class="sidebar-list" id="reportsList">
+        <div style="text-align: center; padding: 20px;">Cargando reportes...</div>
+      </div>
+    </aside>
+
+    <div class="map-area">
+      <div id="map" class="full-map"></div>
+      <div class="detail-card" id="detailCard" style="display:none;">
+        <div class="detail-row">
+          <img src="" alt="" class="detail-img" id="detailImg">
+          <div class="detail-info">
+            <h3 id="detailTitle"></h3>
+            <p id="detailDesc"></p>
+            <div class="detail-location">
+              <i class="fas fa-map-marker-alt"></i>
+              <span id="detailAddress"></span>
+            </div>
+            <span class="badge" id="detailBadge"></span>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-danger btn-sm" onclick="cerrarDetalle()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="script.js"></script>
+  <script>
+    const API_URL_MAPA = 'http://localhost:3000/api';
+    let map;
+    let markers = {};
+    let reportes = [];
+
+    // Inicializar mapa
+    function initMap() {
+      map = L.map('map').setView([-32.1733, -64.1133], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+
+      // Agregar control de geocodificación
+      L.Control.geocoder({
+        defaultMarkGeocode: false,
+        placeholder: 'Buscar dirección...'
+      }).on('markgeocode', function(e) {
+        const center = e.geocode.center;
+        map.setView(center, 16);
+        L.marker(center).addTo(map).bindPopup(e.geocode.name).openPopup();
+      }).addTo(map);
+    }
+
+    // Buscar dirección
+    function buscarDireccion() {
+      const direccion = document.getElementById('addressSearch').value;
+      if (!direccion.trim()) {
+        showToast('Ingresa una dirección', 'error');
+        return;
+      }
+
+      // Usar Nominatim de OpenStreetMap
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccion + ', Río Tercero, Argentina')}&limit=1`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            map.setView([lat, lng], 16);
+            L.marker([lat, lng]).addTo(map).bindPopup(direccion).openPopup();
+            showToast('Dirección encontrada', 'success');
+          } else {
+            showToast('No se encontró la dirección', 'error');
+          }
+        })
+        .catch(() => {
+          showToast('Error al buscar dirección', 'error');
+        });
+    }
+
+    // Cargar reportes reales
+    function cargarReportesMapa() {
+      fetch(API_URL_MAPA + '/reportes')
+        .then(r => r.json())
+        .then(data => {
+          reportes = data;
+          actualizarMapaYLista();
+        })
+        .catch(() => {
+          // Datos demo
+          reportes = [
+            { id: 1, titulo: 'Calle con baches', tipo: 'Baches', descripcion: 'Calle en mal estado con múltiples baches.', direccion: 'Av. Sabattini 450, Río Tercero', latitud: -32.1720, longitud: -64.1150, estado: 'pendiente', imagen: 'img/baches.jpg', usuario_nombre: 'Juan Pérez' },
+            { id: 2, titulo: 'Luminaria rota', tipo: 'Luminaria rota', descripcion: 'Luminaria dañada que no enciende por las noches.', direccion: 'Av. San Martín 800, Río Tercero', latitud: -32.1750, longitud: -64.1100, estado: 'en progreso', imagen: 'img/luminaria.jpg', usuario_nombre: 'Ana Rodríguez' },
+            { id: 3, titulo: 'Acumulación de basura', tipo: 'Basura', descripcion: 'Gran acumulación de basura en esquina.', direccion: 'Barrio Sur, calle 9 de Julio', latitud: -32.1780, longitud: -64.1180, estado: 'pendiente', imagen: 'img/basura.jpg', usuario_nombre: 'Luis López' },
+          ];
+          actualizarMapaYLista();
+        });
+    }
+
+    function actualizarMapaYLista() {
+      // Limpiar marcadores
+      Object.values(markers).forEach(m => map.removeLayer(m));
+      markers = {};
+
+      // Actualizar lista
+      const listContainer = document.getElementById('reportsList');
+      if (reportes.length === 0) {
+        listContainer.innerHTML = '<div style="text-align: center; padding: 20px;">No hay reportes aún</div>';
+        return;
+      }
+
+      listContainer.innerHTML = reportes.map(r => `
+        <div class="report-item" data-id="${r.id}" onclick="irAReporte(${r.id})">
+          <img src="${r.imagen || 'img/default.jpg'}" alt="" class="report-thumb">
+          <div class="report-info">
+            <p class="report-title">${r.titulo}</p>
+            <p class="report-address">${r.direccion}</p>
+            <span class="badge ${getBadgeClassMapa(r.estado)}">${getEstadoTextoMapa(r.estado)}</span>
+          </div>
+        </div>
+      `).join('');
+
+      // Agregar marcadores
+      const statusColors = { 'pendiente': '#f59e0b', 'en progreso': '#1d6fd3', 'resuelto': '#22c55e' };
+      reportes.forEach(r => {
+        const color = statusColors[r.estado] || '#888';
+        const icon = L.divIcon({
+          className: 'custom-marker',
+          html: `<div style="background:${color};width:24px;height:24px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+        const m = L.marker([r.latitud, r.longitud], { icon }).addTo(map);
+        m.on('click', () => mostrarDetalle(r));
+        markers[r.id] = m;
+      });
+    }
+
+    function irAReporte(id) {
+      const r = reportes.find(x => x.id === id);
+      if (r) {
+        mostrarDetalle(r);
+        map.setView([r.latitud, r.longitud], 16);
+      }
+    }
+
+    function mostrarDetalle(r) {
+      const card = document.getElementById('detailCard');
+      card.style.display = 'block';
+      document.getElementById('detailImg').src = r.imagen || 'img/default.jpg';
+      document.getElementById('detailTitle').textContent = r.titulo;
+      document.getElementById('detailDesc').textContent = r.descripcion;
+      document.getElementById('detailAddress').textContent = r.direccion;
+      const badge = document.getElementById('detailBadge');
+      badge.textContent = getEstadoTextoMapa(r.estado);
+      badge.className = 'badge ' + getBadgeClassMapa(r.estado);
+    }
+
+    function cerrarDetalle() {
+      document.getElementById('detailCard').style.display = 'none';
+    }
+
+    function getBadgeClassMapa(estado) {
+      switch(estado) {
+        case 'pendiente': return 'badge-warning';
+        case 'en progreso': return 'badge-primary';
+        case 'resuelto': return 'badge-success';
+        default: return 'badge-warning';
+      }
+    }
+
+    function getEstadoTextoMapa(estado) {
+      switch(estado) {
+        case 'pendiente': return 'Pendiente';
+        case 'en progreso': return 'En progreso';
+        case 'resuelto': return 'Resuelto';
+        default: return estado;
+      }
+    }
+
+    function filterReports() {
+      const q = document.getElementById('searchReports').value.toLowerCase();
+      document.querySelectorAll('.report-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      cargarReportesMapa();
+    });
+  </script>
+</body>
+</html>
