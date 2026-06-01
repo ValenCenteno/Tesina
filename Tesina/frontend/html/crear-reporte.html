@@ -1,0 +1,93 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CiudadActiva - Crear Reporte</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/reporte.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-city"></i> CiudadActiva
+        </div>
+        
+        <nav class="nav-links" id="navLinks">
+            <a href="../html/index.html" class="btn btn-outline">Inicio</a>
+            <a href="../html/crear-reporte.html" class="btn btn-outline">Reportar</a>
+            <a href="../html/mapa.html" class="btn btn-outline">Mapa</a>
+            <a href="../html/admin.html" class="btn btn-outline">Admin</a>
+            <button class="btn btn-outline" id="loginBtn">Iniciar Sesión</button>
+            <button class="btn btn-primary" id="registerBtn">Registro</button>
+        </nav>
+        
+        <button class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</header>
+
+<main class="container">
+    <div class="page-header">
+        <a href="../html/index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Volver</a>
+        <h1>Crear Reporte</h1>
+    </div>
+
+    <form class="report-form" id="reportForm">
+        <div class="form-group">
+            <label>Tipo de problema</label>
+            <select id="problemType" required>
+                <option value="pothole">Calles rotas</option>
+                <option value="streetlight">Luz rota</option>
+                <option value="trash">Basura</option>
+                <option value="broken_pipes">Caños rotos</option>
+                <option value="curb_and_gutter">Cordón despintado</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Descripción</label>
+            <textarea id="description" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Ubicación</label>
+            <input type="text" id="location" required>
+        </div>
+
+        <div class="form-group file-upload">
+            <label class="file-upload-label">
+                <i class="fas fa-upload"></i> Subir foto
+                <input type="file" id="photo" accept="image/*">
+            </label>
+        </div>
+        <div id="photoPreview" class="photo-preview"></div>
+
+        <button class="btn btn-primary btn-full" type="submit">Enviar Reporte</button>
+    </form>
+</main>
+
+<script src="../js/api.js"></script>
+<script src="../js/reporte.js"></script>
+
+<script>
+
+const hamburger =
+    document.getElementById('hamburger');
+
+const navLinks =
+    document.getElementById('navLinks');
+
+hamburger.addEventListener('click', () => {
+
+    navLinks.classList.toggle('active');
+
+});
+
+</script>
+</body>
+</html>
