@@ -1,161 +1,154 @@
-const Report = require('../models/report');
+const Report = require('../models/Report');
+const path = require('path');
+const fs = require('fs');
 
-// Obtener todos los reportes
-const getAllReports = (req, res) => {
-
-    const { search, status } = req.query;
-
-    Report.filter(search, status, (err, reports) => {
-
-        if (err) {
-            return res.status(500).json({
-                success: false,
-                message: 'Error obteniendo reportes',
-                error: err
-            });
+const reportController = {
+    createReport: (req, res) => {
+        const { type, title, description, location, user_id } = req.body;
+        
+        // Procesar imagen si existe
+        let imagePath = null;
+        if (req.file) {
+            imagePath = `/uploads/${req.file.filename}`;
         }
 
-        res.json({
-            success: true,
-            data: reports,
-            total: reports.length
-        });
+        const reportData = {
+            type,
+            title,
+            description,
+            location,
+            image: imagePath,
+            user_id: user_id || null
+        };
 
-    });
-};
-
-// Obtener reporte por ID
-const getReportById = (req, res) => {
-
-    Report.getById(req.params.id, (err, report) => {
-
-        if (err) {
-            return res.status(500).json({
-                success: false,
-                message: 'Error obteniendo reporte',
-                error: err
+        Report.create(reportData, (err, result) => {
+            if (err) {
+                console.error('Error al crear reporte:', err);
+                return res.status(500).json({ error: 'Error al crear el reporte' });
+            }
+            
+            res.status(201).json({ 
+                message: 'Reporte creado exitosamente', 
+                reportId: result.insertId,
+                image: imagePath
             });
+        });
+    },
+
+    getAllReports: (req, res) => {
+        Report.findAll((err, reports) => {
+            if (err) {
+                console.error('Error al obtener reportes:', err);
+                return res.status(500).json({ error: 'Error al obtener los reportes' });
+            }
+            res.json(reports);
+        });
+    },
+
+    getReportById: (req, res) => {
+        const { id } = req.params;
+        Report.findById(id, (err, report) => {
+            if (err || !report || report.length === 0) {
+                return res.status(404).json({ error: 'Reporte no encontrado' });
+            }
+            res.json(report[0]);
+        });
+    },
+
+    updateReport: (req, res) => {
+        const { id } = req.params;
+        const { type, title, description, location, status } = req.body;
+        
+        let imagePath = null;
+        if (req.file) {
+            imagePath = `/uploads/${req.file.filename}`;
         }
 
-        if (!report) {
-            return res.status(404).json({
-                success: false,
-                message: 'Reporte no encontrado'
+        // Obtener reporte actual para eliminar imagen vieja si es necesario
+        Report.findById(id, (err, existingReport) => {
+            if (err || !existingReport || existingReport.length === 0) {
+                return res.status(404).json({ error: 'Reporte no encontrado' });
+            }
+
+            const finalImage = imagePath || existingReport[0].image;
+            
+            // Si hay imagen nueva y existía una vieja, eliminar la vieja
+            if (imagePath && existingReport[0].image) {
+                const oldImagePath = path.join(__dirname, '../../uploads', path.basename(existingReport[0].image));
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath);
+                }
+            }
+
+            const reportData = {
+                type,
+                title,
+                description,
+                location,
+                status,
+                image: finalImage
+            };
+
+            Report.update(id, reportData, (err, result) => {
+                if (err) {
+                    console.error('Error al actualizar reporte:', err);
+                    return res.status(500).json({ error: 'Error al actualizar el reporte' });
+                }
+                res.json({ message: 'Reporte actualizado exitosamente', image: finalImage });
             });
-        }
-
-        res.json({
-            success: true,
-            data: report
         });
+    },
 
-    });
-};
+    updateReportStatus: (req, res) => {
+        const { id } = req.params;
+        const { status } = req.body;
 
-// Crear reporte
-const createReport = (req, res) => {
-
-    const { type, description, location, user } = req.body;
-
-    if (!type || !description || !location) {
-
-        return res.status(400).json({
-            success: false,
-            message: 'Faltan campos requeridos'
+        Report.updateStatus(id, status, (err, result) => {
+            if (err) {
+                console.error('Error al actualizar estado:', err);
+                return res.status(500).json({ error: 'Error al actualizar el estado' });
+            }
+            res.json({ message: 'Estado actualizado exitosamente' });
         });
+    },
 
+    deleteReport: (req, res) => {
+        const { id } = req.params;
+
+        // Obtener el reporte para eliminar la imagen asociada
+        Report.findById(id, (err, report) => {
+            if (err || !report || report.length === 0) {
+                return res.status(404).json({ error: 'Reporte no encontrado' });
+            }
+
+            // Eliminar imagen si existe
+            if (report[0].image) {
+                const imagePath = path.join(__dirname, '../../uploads', path.basename(report[0].image));
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
+            }
+
+            Report.delete(id, (err, result) => {
+                if (err) {
+                    console.error('Error al eliminar reporte:', err);
+                    return res.status(500).json({ error: 'Error al eliminar el reporte' });
+                }
+                res.json({ message: 'Reporte eliminado exitosamente' });
+            });
+        });
+    },
+
+    getUserReports: (req, res) => {
+        const { userId } = req.params;
+        Report.findByUser(userId, (err, reports) => {
+            if (err) {
+                console.error('Error al obtener reportes del usuario:', err);
+                return res.status(500).json({ error: 'Error al obtener los reportes' });
+            }
+            res.json(reports);
+        });
     }
-
-    Report.create({
-        type,
-        description,
-        location,
-        user: user || 'Usuario Anónimo'
-    }, (err, result) => {
-
-        if (err) {
-            return res.status(500).json({
-                success: false,
-                message: 'Error creando reporte',
-                error: err
-            });
-        }
-
-        res.status(201).json({
-            success: true,
-            message: 'Reporte creado correctamente',
-            id: result.insertId
-        });
-
-    });
-
 };
 
-// Actualizar estado
-const updateReportStatus = (req, res) => {
-
-    const { status } = req.body;
-
-    const validStatuses = [
-        'pending',
-        'in-progress',
-        'resolved'
-    ];
-
-    if (!status || !validStatuses.includes(status)) {
-
-        return res.status(400).json({
-            success: false,
-            message: 'Estado inválido'
-        });
-
-    }
-
-    Report.update(req.params.id, { status }, (err, result) => {
-
-        if (err) {
-            return res.status(500).json({
-                success: false,
-                message: 'Error actualizando reporte',
-                error: err
-            });
-        }
-
-        res.json({
-            success: true,
-            message: 'Reporte actualizado'
-        });
-
-    });
-
-};
-
-// Eliminar reporte
-const deleteReport = (req, res) => {
-
-    Report.delete(req.params.id, (err, result) => {
-
-        if (err) {
-            return res.status(500).json({
-                success: false,
-                message: 'Error eliminando reporte',
-                error: err
-            });
-        }
-
-        res.json({
-            success: true,
-            message: 'Reporte eliminado'
-        });
-
-    });
-
-};
-
-module.exports = {
-    getAllReports,
-    getReportById,
-    createReport,
-    updateReportStatus,
-    deleteReport
-};
+module.exports = reportController;

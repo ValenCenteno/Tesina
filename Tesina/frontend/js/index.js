@@ -1,271 +1,102 @@
-// Sample data structure
-const sampleReports = [
-    {
-        id: 1,
-        user: "Maria Gonzalez",
-        type: "pothole",
-        title: "Large pothole on main road",
-        description: "Dangerous pothole causing traffic issues",
-        location: "Av. Principal 123",
-        status: "pending",
-        image: "pothole"
-    },
-    {
-        id: 2,
-        user: "Carlos Lopez",
-        type: "streetlight",
-        title: "Multiple broken streetlights",
-        description: "Area completely dark at night",
-        location: "Plaza Central",
-        status: "in-progress",
-        image: "streetlight"
-    },
-    {
-        id: 3,
-        user: "Ana Martinez",
-        type: "trash",
-        title: "Trash overflow at park",
-        description: "Bins overflowing for 3 days",
-        location: "Parque Lineal",
-        status: "resolved",
-        image: "trash"
-    },
-    {
-        id: 4,
-        user: "Juan Perez",
-        type: "graffiti",
-        title: "Graffiti on school wall",
-        description: "Vandalism on public school",
-        location: "Escuela N°5",
-        status: "pending",
-        image: "graffiti"
-    }
-];
-
-// DOM elements
-const pages = document.querySelectorAll('.page');
-const recentProblemsEl = document.getElementById('recentProblems');
-const mapReportsListEl = document.getElementById('mapReportsList');
-const adminTableBodyEl = document.getElementById('adminTableBody');
-const reportFormEl = document.getElementById('reportForm');
-const photoInputEl = document.getElementById('photo');
-const photoPreviewEl = document.getElementById('photoPreview');
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const mobileToggleBtn = document.getElementById('mobileToggle');
-const mobileNavEl = document.getElementById('mobileNav');
-
-// Status colors mapping
-const statusColors = {
-    pending: 'status-pending',
-    'in-progress': 'status-progress',
-    resolved: 'status-resolved'
-};
-
-// Initialize app
-document.addEventListener('DOMContentLoaded', function() {
-    renderRecentProblems();
-    renderMapReports();
-    renderAdminTable();
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("✅ index.js cargado");
     
-    // Event listeners
-    reportFormEl.addEventListener('submit', handleReportSubmit);
-    photoInputEl.addEventListener('change', handlePhotoUpload);
-    
-    // Auth button handlers (demo)
-    loginBtn.addEventListener('click', () => alert('Login functionality - coming soon!'));
-    registerBtn.addEventListener('click', () => alert('Register functionality - coming soon!'));
-    mobileToggleBtn.addEventListener('click', toggleMobileNav);
-    
-    // Admin search and filter
-    document.getElementById('adminSearch').addEventListener('input', handleAdminSearch);
-    document.getElementById('statusFilter').addEventListener('change', handleAdminFilter);
-    
-    // Map search
-    document.getElementById('mapSearch').addEventListener('input', handleMapSearch);
+    // Cargar reportes recientes
+    await loadRecentReports();
 });
 
-// Page navigation
-function showPage(pageId) {
-    pages.forEach(page => page.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
+async function loadRecentReports() {
+    const reportsList = document.getElementById('recentReportsList');
+    if (!reportsList) return;
     
-    // Re-render data for active page
-    if (pageId === 'home') renderRecentProblems();
-    if (pageId === 'reports-map') renderMapReports();
-    if (pageId === 'admin-dashboard') renderAdminTable();
-}
-
-// 1. Render Recent Problems (Home page)
-function renderRecentProblems(filteredReports = sampleReports.slice(0, 3)) {
-    recentProblemsEl.innerHTML = filteredReports.map(report => `
-        <div class="problem-card" onclick="showPage('reports-map')">
-            <div class="problem-image">
-                <i class="fas fa-${getIcon(report.type)}"></i>
-            </div>
-            <div class="problem-content">
-                <h3 class="problem-title">${report.title}</h3>
-                <p class="problem-description">${report.description}</p>
-                <div class="problem-meta">
-                    <span>${report.location}</span>
-                    <span class="status-tag ${statusColors[report.status]}">${report.status.replace('-', ' ').toUpperCase()}</span>
+    try {
+        reportsList.innerHTML = '<div class="loading">Cargando reportes...</div>';
+        
+        const response = await fetch('http://localhost:3000/api/reports');
+        if (!response.ok) throw new Error('Error al cargar reportes');
+        
+        const reports = await response.json();
+        
+        if (!reports || reports.length === 0) {
+            reportsList.innerHTML = '<div class="no-reports">No hay reportes aún. ¡Sé el primero en reportar!</div>';
+            return;
+        }
+        
+        // Mostrar solo los últimos 6 reportes
+        const recentReports = reports.slice(0, 6);
+        
+        reportsList.innerHTML = recentReports.map(report => `
+            <div class="report-card-item">
+                ${report.image ? `
+                    <div class="report-image">
+                        <img src="http://localhost:3000${report.image}" alt="${report.title}" onerror="this.src='../img/placeholder.png'">
+                    </div>
+                ` : `
+                    <div class="report-image-placeholder">
+                        📷 Sin imagen
+                    </div>
+                `}
+                <div class="report-info">
+                    <span class="report-type ${getTypeClass(report.type)}">${getTypeText(report.type)}</span>
+                    <h3>${escapeHtml(report.title || 'Sin título')}</h3>
+                    <p>${escapeHtml(report.description.substring(0, 100))}${report.description.length > 100 ? '...' : ''}</p>
+                    <div class="report-meta">
+                        <span class="report-location">📍 ${escapeHtml(report.location)}</span>
+                        <span class="report-date">📅 ${formatDate(report.created_at)}</span>
+                    </div>
+                    <span class="report-status status-${report.status}">${getStatusText(report.status)}</span>
                 </div>
             </div>
-        </div>
-    `).join('');
-}
-
-// 2. Render Map Reports
-function renderMapReports(filteredReports = sampleReports) {
-    mapReportsListEl.innerHTML = filteredReports.map(report => `
-        <div class="map-report-item" data-report-id="${report.id}">
-            <h4>${report.title}</h4>
-            <p>${report.location}</p>
-            <span class="status-tag ${statusColors[report.status]}">${report.status.replace('-', ' ').toUpperCase()}</span>
-        </div>
-    `).join('');
-    
-    // Add click handlers
-    document.querySelectorAll('.map-report-item').forEach(item => {
-        item.addEventListener('click', function() {
-            document.querySelectorAll('.map-report-item').forEach(i => i.classList.remove('active'));
-            this.classList.add('active');
-            // Map marker simulation
-            console.log('Show report', this.dataset.reportId, 'on map');
-        });
-    });
-}
-
-// 3. Render Admin Table
-function renderAdminTable(filteredReports = sampleReports) {
-    adminTableBodyEl.innerHTML = filteredReports.map(report => `
-        <tr>
-            <td>#${report.id}</td>
-            <td>${report.user}</td>
-            <td>${report.type.replace('-', ' ').toUpperCase()}</td>
-            <td>${report.location}</td>
-            <td>
-                <select class="status-select" data-report-id="${report.id}" onchange="updateStatus(${report.id}, this.value)">
-                    <option value="pending" ${report.status === 'pending' ? 'selected' : ''}>Pending</option>
-                    <option value="in-progress" ${report.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
-                    <option value="resolved" ${report.status === 'resolved' ? 'selected' : ''}>Resolved</option>
-                </select>
-            </td>
-            <td>
-                <button class="delete-btn" onclick="deleteReport(${report.id})">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// Utility functions
-function getIcon(type) {
-    const icons = {
-        pothole: 'road',
-        streetlight: 'lightbulb',
-        trash: 'trash-alt',
-        graffiti: 'spray-can',
-        other: 'exclamation-triangle'
-    };
-    return icons[type] || 'exclamation-triangle';
-}
-
-function toggleMobileNav() {
-    mobileNavEl.classList.toggle('show');
-}
-
-// Form handlers
-function handlePhotoUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            photoPreviewEl.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-        };
-        reader.readAsDataURL(file);
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error al cargar reportes:', error);
+        reportsList.innerHTML = '<div class="error">Error al cargar los reportes. Intenta más tarde.</div>';
     }
 }
 
-function handleReportSubmit(e) {
-    e.preventDefault();
-    
-    // Simulate form submission
-    const formData = {
-        type: document.getElementById('problemType').value,
-        description: document.getElementById('description').value,
-        location: document.getElementById('location').value,
-        photo: photoInputEl.files[0]
+function getTypeClass(type) {
+    const types = {
+        'calle_rota': 'type-road',
+        'basura': 'type-garbage',
+        'luminaria': 'type-light',
+        'caño_roto': 'type-water',
+        'cordon': 'type-curb',
+        'otro': 'type-other'
     };
-    
-    // Add to sample data (in real app, send to API)
-    const newReport = {
-        id: sampleReports.length + 1,
-        user: "Current User",
-        type: formData.type,
-        title: formData.description.substring(0, 50) + '...',
-        description: formData.description,
-        location: formData.location,
-        status: 'pending',
-        image: formData.type
+    return types[type] || 'type-other';
+}
+
+function getTypeText(type) {
+    const types = {
+        'calle_rota': '🚧 Calle rota',
+        'basura': '🗑️ Basura',
+        'luminaria': '💡 Luminaria',
+        'caño_roto': '💧 Caño roto',
+        'cordon': '🎨 Cordón',
+        'otro': '📌 Otro'
     };
-    
-    sampleReports.unshift(newReport);
-    
-    alert('Gracias por su reporte!');
-    reportFormEl.reset();
-    photoPreviewEl.innerHTML = '';
-    showPage('home');
+    return types[type] || '📌 Otro';
 }
 
-// Admin functionality
-function updateStatus(reportId, newStatus) {
-    const report = sampleReports.find(r => r.id === reportId);
-    if (report) {
-        report.status = newStatus;
-        renderAdminTable();
-        alert(`Status updated to ${newStatus.replace('-', ' ')}`);
-    }
+function getStatusText(status) {
+    const statuses = {
+        'pendiente': 'Pendiente',
+        'en_proceso': 'En proceso',
+        'resuelto': 'Resuelto'
+    };
+    return statuses[status] || 'Pendiente';
 }
 
-function deleteReport(reportId) {
-    if (confirm('Are you sure you want to delete this report?')) {
-        const index = sampleReports.findIndex(r => r.id === reportId);
-        if (index !== -1) {
-            sampleReports.splice(index, 1);
-            renderAdminTable();
-            renderRecentProblems();
-            renderMapReports();
-            alert('Report deleted successfully');
-        }
-    }
+function formatDate(dateString) {
+    if (!dateString) return 'Fecha no disponible';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-AR');
 }
 
-function handleAdminSearch(e) {
-    const query = e.target.value.toLowerCase();
-    const filtered = sampleReports.filter(report => 
-        report.user.toLowerCase().includes(query) ||
-        report.location.toLowerCase().includes(query) ||
-        report.type.includes(query)
-    );
-    renderAdminTable(filtered);
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
-
-function handleAdminFilter(e) {
-    const status = e.target.value;
-    const filtered = status 
-        ? sampleReports.filter(report => report.status === status)
-        : sampleReports;
-    renderAdminTable(filtered);
-}
-
-function handleMapSearch(e) {
-    const query = e.target.value.toLowerCase();
-    const filtered = sampleReports.filter(report => 
-        report.title.toLowerCase().includes(query) ||
-        report.location.toLowerCase().includes(query)
-    );
-    renderMapReports(filtered);
-}
-

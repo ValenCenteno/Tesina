@@ -1,82 +1,98 @@
-// Configuración de la API
 const API_URL = 'http://localhost:3000/api';
 
-// Función genérica para peticiones fetch
-async function apiFetch(endpoint, options = {}) {
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
-            ...options
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.message || 'Error en la petición');
-        }
-        
-        return data;
-    } catch (error) {
-        console.error('API Error:', error);
-        throw error;
-    }
-}
-
-// Funciones específicas para reportes
-async function getReports(search = '', status = '') {
-    const params = new URLSearchParams();
-    if (search) params.append('search', search);
-    if (status) params.append('status', status);
+// Función para hacer peticiones autenticadas
+async function fetchAuth(endpoint, options = {}) {
+    const token = localStorage.getItem('token');
     
-    const endpoint = `/reports${params.toString() ? '?' + params.toString() : ''}`;
-    const response = await apiFetch(endpoint);
-    return response.data;
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    };
+    
+    if (token) {
+        defaultOptions.headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const finalOptions = {
+        ...defaultOptions,
+        ...options,
+        headers: {
+            ...defaultOptions.headers,
+            ...options.headers
+        }
+    };
+    
+    // Si hay FormData, no establecer Content-Type (se establecerá automáticamente)
+    if (options.body && options.body instanceof FormData) {
+        delete finalOptions.headers['Content-Type'];
+    }
+    
+    const response = await fetch(`${API_URL}${endpoint}`, finalOptions);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Error en la petición');
+    }
+    
+    return response.json();
 }
 
-async function getReportById(id) {
-    const response = await apiFetch(`/reports/${id}`);
-    return response.data;
-}
-
-async function createReport(reportData) {
-    const response = await apiFetch('/reports', {
+// Funciones de autenticación
+async function register(username, password) {
+    return fetchAuth('/auth/register', {
         method: 'POST',
-        body: JSON.stringify(reportData)
+        body: JSON.stringify({ username, password })
     });
-    return response.data;
+}
+
+async function login(username, password) {
+    return fetchAuth('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password })
+    });
+}
+
+async function getCurrentUser() {
+    return fetchAuth('/auth/me');
+}
+
+// Funciones de reportes
+async function getReports() {
+    return fetchAuth('/reports');
+}
+
+async function getReport(id) {
+    return fetchAuth(`/reports/${id}`);
+}
+
+async function createReport(formData) {
+    return fetchAuth('/reports', {
+        method: 'POST',
+        body: formData
+    });
+}
+
+async function updateReport(id, formData) {
+    return fetchAuth(`/reports/${id}`, {
+        method: 'PUT',
+        body: formData
+    });
 }
 
 async function updateReportStatus(id, status) {
-    const response = await apiFetch(`/reports/${id}/status`, {
-        method: 'PUT',
+    return fetchAuth(`/reports/${id}/status`, {
+        method: 'PATCH',
         body: JSON.stringify({ status })
     });
-    return response.data;
 }
 
 async function deleteReport(id) {
-    const response = await apiFetch(`/reports/${id}`, {
+    return fetchAuth(`/reports/${id}`, {
         method: 'DELETE'
     });
-    return response;
 }
 
-async function deleteAllReports() {
-    const response = await apiFetch('/reports', {
-        method: 'DELETE'
-    });
-    return response;
+async function getUserReports(userId) {
+    return fetchAuth(`/reports/user/${userId}`);
 }
-
-// Exportar funciones (disponibles globalmente)
-window.api = {
-    getReports,
-    getReportById,
-    createReport,
-    updateReportStatus,
-    deleteReport,
-    deleteAllReports
-};

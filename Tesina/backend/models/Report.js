@@ -1,96 +1,73 @@
 const db = require('../config/db');
 
-class Report {
-
-    static getAll(callback) {
-        const sql = 'SELECT * FROM reports ORDER BY createdAt DESC';
-
-        db.query(sql, (err, results) => {
-            callback(err, results);
-        });
-    }
-
-    static getById(id, callback) {
-        const sql = 'SELECT * FROM reports WHERE id = ?';
-
-        db.query(sql, [id], (err, results) => {
-            callback(err, results[0]);
-        });
-    }
-
-    static create(data, callback) {
-        const sql = `
-            INSERT INTO reports
-            (user, type, title, description, location, status, image)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+const Report = {
+    create: (reportData, callback) => {
+        const query = `
+            INSERT INTO reports (type, title, description, location, status, image, user_id, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
         `;
+        db.query(query, [
+            reportData.type,
+            reportData.title,
+            reportData.description,
+            reportData.location,
+            'pendiente',
+            reportData.image || null,
+            reportData.user_id || null
+        ], callback);
+    },
 
-        const values = [
-            data.user || 'Usuario Anónimo',
-            data.type,
-            data.title || data.description.substring(0, 50),
-            data.description,
-            data.location,
-            data.status || 'pending',
-            data.image || data.type
-        ];
+    findAll: (callback) => {
+        const query = `
+            SELECT r.*, u.username 
+            FROM reports r 
+            LEFT JOIN users u ON r.user_id = u.id 
+            ORDER BY r.created_at DESC
+        `;
+        db.query(query, callback);
+    },
 
-        db.query(sql, values, (err, result) => {
-            callback(err, result);
-        });
-    }
+    findById: (id, callback) => {
+        const query = `
+            SELECT r.*, u.username 
+            FROM reports r 
+            LEFT JOIN users u ON r.user_id = u.id 
+            WHERE r.id = ?
+        `;
+        db.query(query, [id], callback);
+    },
 
-    static update(id, updates, callback) {
-        const sql = `
-            UPDATE reports
-            SET status = ?, updatedAt = NOW()
+    update: (id, reportData, callback) => {
+        const query = `
+            UPDATE reports 
+            SET type = ?, title = ?, description = ?, location = ?, status = ?, image = ?, updated_at = NOW()
             WHERE id = ?
         `;
+        db.query(query, [
+            reportData.type,
+            reportData.title,
+            reportData.description,
+            reportData.location,
+            reportData.status,
+            reportData.image,
+            id
+        ], callback);
+    },
 
-        db.query(sql, [updates.status, id], (err, result) => {
-            callback(err, result);
-        });
+    updateStatus: (id, status, callback) => {
+        const query = 'UPDATE reports SET status = ?, updated_at = NOW() WHERE id = ?';
+        db.query(query, [status, id], callback);
+    },
+
+    delete: (id, callback) => {
+        const query = 'DELETE FROM reports WHERE id = ?';
+        db.query(query, [id], callback);
+    },
+
+    findByUser: (userId, callback) => {
+        const query = 'SELECT * FROM reports WHERE user_id = ? ORDER BY created_at DESC';
+        db.query(query, [userId], callback);
     }
-
-    static delete(id, callback) {
-        const sql = 'DELETE FROM reports WHERE id = ?';
-
-        db.query(sql, [id], (err, result) => {
-            callback(err, result);
-        });
-    }
-
-    static filter(query, status, callback) {
-
-        let sql = 'SELECT * FROM reports WHERE 1=1';
-        let values = [];
-
-        if (query) {
-            sql += `
-                AND (
-                    user LIKE ?
-                    OR location LIKE ?
-                    OR description LIKE ?
-                )
-            `;
-
-            const search = `%${query}%`;
-
-            values.push(search, search, search);
-        }
-
-        if (status && status !== '') {
-            sql += ' AND status = ?';
-            values.push(status);
-        }
-
-        sql += ' ORDER BY createdAt DESC';
-
-        db.query(sql, values, (err, results) => {
-            callback(err, results);
-        });
-    }
-}
+};
 
 module.exports = Report;
-
