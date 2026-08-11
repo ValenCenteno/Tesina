@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CiudadActiva - Crear Reporte</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/reporte.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-city"></i> CiudadActiva
+        </div>
+        <nav class="nav-links" id="navLinks">
+            <a href="../html/index.html" class="btn btn-outline">Inicio</a>
+            <a href="../html/mapa.html" class="btn btn-outline">Mapa</a>
+            <a href="../html/crear-reporte.html" id="reportLink" class="btn btn-outline" style="display:none">Reportar</a>
+            <a href="../html/admin.html" id="adminLink" class="btn btn-outline" style="display:none">Admin</a>
+
+            <button class="btn btn-outline" id="loginBtn">Iniciar Sesión</button>
+            <button class="btn btn-primary" id="registerBtn">Registro</button>
+
+            <div id="userMenu" style="display:none; align-items:center; gap:10px;">
+                <span id="usernameDisplay" class="navbar-username"></span>
+                <button class="btn btn-outline" id="logoutBtn">Cerrar Sesión</button>
+            </div>
+        </nav>
+        <button class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</header>
+
+<main class="container">
+    <div class="page-header">
+        <a href="../html/index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <h1>Crear Reporte</h1>
+    </div>
+
+    <div class="report-layout">
+
+        <!-- Formulario -->
+        <div class="report-card">
+            <div class="report-header">
+                <h2><i class="fas fa-exclamation-circle"></i> Reportar Problema Urbano</h2>
+                <p>Ayudanos a mejorar Río Tercero</p>
+            </div>
+            <div class="report-body">
+                <div id="formAlert"></div>
+                <form id="reportForm">
+
+                    <div class="form-group">
+                        <label for="problemType">Tipo de problema <span class="required">*</span></label>
+                        <select id="problemType" name="problemType" required>
+                            <option value="">Seleccioná un tipo</option>
+                            <option value="calle_rota">Calle rota / Bache</option>
+                            <option value="basura">Acumulación de basura</option>
+                            <option value="luminaria">Luminaria rota</option>
+                            <option value="caño_roto">Caño roto / Fuga de agua</option>
+                            <option value="cordon">Cordón despintado / Dañado</option>
+                            <option value="otro">Otro problema</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title">Título <span class="optional">(opcional)</span></label>
+                        <input type="text" id="title" name="title"
+                               placeholder="Ej: Bache peligroso en esquina">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Descripción detallada <span class="required">*</span></label>
+                        <textarea id="description" name="description" rows="3" required
+                                  placeholder="Describí el problema con el mayor detalle posible..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Dirección / Ubicación <span class="required">*</span></label>
+                        <input type="text" id="location" name="location" required
+                               placeholder="Ej: San Martín 123, entre Argentina y Belgrano">
+                        <small class="help-text">
+                            <i class="fas fa-info-circle"></i>
+                            También podés marcar el punto exacto en el mapa
+                        </small>
+                    </div>
+
+                    <!-- Campos ocultos para coordenadas -->
+                    <input type="hidden" id="coordLat" name="lat">
+                    <input type="hidden" id="coordLng" name="lng">
+
+                    <div class="form-group">
+                        <label for="photo">Fotografía <span class="optional">(opcional, máx. 5MB)</span></label>
+                        <input type="file" id="photo" name="photo"
+                               accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                        <div id="photoPreview" class="photo-preview"></div>
+                        <small class="help-text">Formatos: JPG, PNG, GIF, WEBP</small>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Enviar Reporte
+                    </button>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Mini mapa -->
+        <div class="map-picker-card">
+            <div class="map-picker-header">
+                <h3><i class="fas fa-map-pin"></i> Marcá el punto exacto</h3>
+                <p>Hacé clic en el mapa para fijar la ubicación</p>
+            </div>
+            <div id="miniMap"></div>
+            <div class="coords-display" id="coordsDisplay" style="display:none">
+                <i class="fas fa-check-circle" style="color: #16a34a"></i>
+                <span id="coordsText">Ubicación marcada</span>
+                <button type="button" class="clear-pin" id="clearPin">
+                    <i class="fas fa-times"></i> Quitar
+                </button>
+            </div>
+            <p class="map-picker-hint">
+                <i class="fas fa-lightbulb"></i>
+                El mapa se centra en Río Tercero. Podés hacer zoom y desplazarte libremente.
+            </p>
+        </div>
+
+    </div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/reporte.js"></script>
+
+<script>
+    // Hamburger menu
+    const hamburger = document.getElementById('hamburger');
+    const navLinks  = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        const icon = hamburger.querySelector('i');
+        icon.classList.toggle('fa-bars');
+        icon.classList.toggle('fa-times');
+    });
+</script>
+</body>
+</html>
