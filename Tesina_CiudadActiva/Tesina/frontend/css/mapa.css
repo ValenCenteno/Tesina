@@ -1,0 +1,724 @@
+.map-page-content {
+    position: relative;
+    height: calc(100vh - 190px);
+    min-height: 520px;
+    margin-bottom: 2rem;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+/* Panel flotante */
+.sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 336px;
+    z-index: 10;
+
+    background: rgba(236, 239, 238, 0.96);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+
+    border-right: 1px solid var(--border);
+    padding: 1.1rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.sidebar-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gray-500);
+    margin: 0;
+    font-family: var(--font-mono);
+}
+
+/* Búsqueda */
+.search-box { position: relative; }
+
+.search-box input {
+    width: 100%;
+    padding: 0.62rem 0.9rem 0.62rem 2.4rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 0.86rem;
+    outline: none;
+    background: var(--surface);
+    transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    color: var(--gray-800);
+    font-family: inherit;
+}
+.search-box input::placeholder { color: var(--gray-500); }
+
+.search-box input:focus {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-focus);
+}
+
+.search-box i {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500);
+    font-size: 0.78rem;
+    pointer-events: none;
+}
+
+/* Filtros — pill tabs, patrón Uiverse "segmented filter" */
+.filter-bar {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.32rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--gray-600);
+    transition: all 0.15s var(--ease);
+    font-family: inherit;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+}
+
+/* Lista de reportes */
+.reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 2px;
+    margin: -2px;
+    padding: 2px;
+}
+
+.map-report-item {
+    padding: 0.75rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s var(--ease);
+    background: var(--surface);
+}
+
+.map-report-item:hover {
+    border-color: var(--border-strong);
+    background: var(--gray-50);
+}
+
+.map-report-item.active {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+    box-shadow: var(--shadow-focus);
+}
+
+.map-report-item h4 {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-report-item .item-location {
+    font-size: 0.74rem;
+    color: var(--gray-500);
+    margin: 0 0 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-report-item .item-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.map-report-item .item-date {
+    font-size: 0.68rem;
+    color: var(--gray-500);
+    font-family: var(--font-mono);
+}
+
+/* =============================================================
+   MAPA — AJUSTE MODO OSCURO
+   ============================================================= */
+
+[data-theme="dark"] .map-page-content {
+    background: var(--surface-sunken);
+}
+
+
+/* =============================================================
+   PANEL LATERAL
+   ============================================================= */
+
+[data-theme="dark"] .sidebar {
+    background: #151D1B;
+    border-right: 1px solid #2E3936;
+    color: var(--gray-800);
+}
+
+
+/* =============================================================
+   TÍTULO DEL PANEL
+   ============================================================= */
+
+[data-theme="dark"] .sidebar h2,
+[data-theme="dark"] .sidebar h3,
+[data-theme="dark"] .sidebar-title {
+    color: #E8ECEB;
+}
+
+
+/* =============================================================
+   BUSCADOR
+   ============================================================= */
+
+[data-theme="dark"] #mapSearch {
+    background: #0F1614;
+    border: 1px solid #34413D;
+    color: #E8ECEB;
+}
+
+[data-theme="dark"] #mapSearch::placeholder {
+    color: #7F8C88;
+}
+
+[data-theme="dark"] #mapSearch:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-bg);
+}
+
+
+/* =============================================================
+   FILTROS
+   ============================================================= */
+
+[data-theme="dark"] .filter-btn {
+    background: #202A27;
+    border: 1px solid #34413D;
+    color: #AEB9B5;
+}
+
+[data-theme="dark"] .filter-btn:hover {
+    background: #293431;
+    border-color: #43514D;
+    color: #E8ECEB;
+}
+
+[data-theme="dark"] .filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+
+/* =============================================================
+   LISTA DE REPORTES
+   ============================================================= */
+
+[data-theme="dark"] #mapReportsList {
+    background: transparent;
+}
+
+
+/* =============================================================
+   TARJETA DE REPORTE
+   ============================================================= */
+
+[data-theme="dark"] .map-report-item {
+    background: #1B2522;
+    border: 1px solid #303D39;
+    color: #D5DCDA;
+
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.20);
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+[data-theme="dark"] .map-report-item:hover {
+    background: #202B28;
+    border-color: #43514D;
+
+    box-shadow:
+        0 5px 14px rgba(0, 0, 0, 0.28);
+
+    transform: translateY(-1px);
+}
+
+
+/* =============================================================
+   REPORTE ACTIVO
+   ============================================================= */
+
+[data-theme="dark"] .map-report-item.active {
+    background: rgba(45, 212, 191, 0.09);
+    border-color: var(--primary);
+    box-shadow:
+        0 0 0 1px rgba(45, 212, 191, 0.15);
+}
+
+
+/* =============================================================
+   TÍTULO DEL REPORTE
+   ============================================================= */
+
+[data-theme="dark"] .map-report-item h4 {
+    color: #E8ECEB;
+}
+
+
+/* =============================================================
+   UBICACIÓN
+   ============================================================= */
+
+[data-theme="dark"] .map-report-item .item-location {
+    color: #8F9D99;
+}
+
+[data-theme="dark"] .map-report-item .item-location i {
+    color: var(--primary) !important;
+}
+
+
+/* =============================================================
+   META DEL REPORTE
+   ============================================================= */
+
+[data-theme="dark"] .map-report-item .item-meta {
+    color: #A5B0AD;
+}
+
+
+/* =============================================================
+   "SIN COORDS"
+   ============================================================= */
+
+[data-theme="dark"] .map-report-item small {
+    color: #7F8C88 !important;
+}
+
+
+/* =============================================================
+   ESTADOS
+   ============================================================= */
+
+[data-theme="dark"] .status-pendiente {
+    background: rgba(180, 83, 9, 0.16);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .status-en_proceso {
+    background: rgba(45, 212, 191, 0.12);
+    color: #2DD4BF;
+}
+
+[data-theme="dark"] .status-resuelto {
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ADE80;
+}
+
+
+/* =============================================================
+   SCROLLBAR DEL SIDEBAR
+   ============================================================= */
+
+[data-theme="dark"] .sidebar::-webkit-scrollbar,
+[data-theme="dark"] #mapReportsList::-webkit-scrollbar {
+    width: 7px;
+}
+
+[data-theme="dark"] .sidebar::-webkit-scrollbar-track,
+[data-theme="dark"] #mapReportsList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+[data-theme="dark"] .sidebar::-webkit-scrollbar-thumb,
+[data-theme="dark"] #mapReportsList::-webkit-scrollbar-thumb {
+    background: #3B4844;
+    border-radius: 10px;
+}
+
+[data-theme="dark"] .sidebar::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] #mapReportsList::-webkit-scrollbar-thumb:hover {
+    background: #53625E;
+}
+
+
+/* =============================================================
+   MAPA
+   ============================================================= */
+
+[data-theme="dark"] .map-area {
+    background: #101614;
+}
+
+
+/* =============================================================
+   POPUPS DE LEAFLET
+   ============================================================= */
+
+[data-theme="dark"] .leaflet-popup-content-wrapper,
+[data-theme="dark"] .leaflet-popup-tip {
+    background: #18201E;
+    color: #D5DCDA;
+}
+
+[data-theme="dark"] .leaflet-popup-content {
+    color: #D5DCDA;
+}
+
+[data-theme="dark"] .popup-card h4 {
+    color: #E8ECEB;
+}
+
+[data-theme="dark"] .popup-location {
+    color: #9BA8A4;
+}
+
+[data-theme="dark"] .popup-desc {
+    color: #AEB9B5;
+}
+
+[data-theme="dark"] .popup-date {
+    color: #7F8C88;
+}
+
+
+/* =============================================================
+   BOTONES DE ZOOM
+   ============================================================= */
+
+[data-theme="dark"] .leaflet-control-zoom a {
+    background: #18201E;
+    color: #D5DCDA;
+    border-color: #34413D;
+}
+
+[data-theme="dark"] .leaflet-control-zoom a:hover {
+    background: #202A27;
+    color: var(--primary);
+}
+/* Tipos de problema */
+.type-badge {
+    font-size: 0.66rem;
+    font-weight: 600;
+    padding: 0.18rem 0.5rem;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.type-calle_rota  { background: #fef3e2; color: #713f12; }
+.type-basura      { background: #fce7f3; color: #713f12; }
+.type-luminaria   { background: #fef9c3; color: #713f12; }
+.type-cano_roto   { background: #e6f0ff; color: #713f12; }
+.type-cordon      { background: #f3e8ff; color: #713f12; }
+.type-otro        { background: var(--gray-100); color: var(--gray-700); }
+
+/* Estado vacío / cargando */
+.list-empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--gray-500);
+}
+
+.list-empty i {
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
+    color: var(--gray-300);
+    display: block;
+}
+
+.list-empty p { font-size: 0.85rem; margin: 0; }
+
+/* Área del mapa — ocupa todo, el panel flota encima */
+.map-area {
+    width: calc(100% - 336px);
+    height: 100%;
+    margin-left: 336px;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    background: var(--gray-100);
+}
+
+/* Popup personalizado de Leaflet — patrón Uiverse "minimal
+   popover card" */
+.leaflet-popup-content-wrapper {
+    border-radius: 10px !important;
+    box-shadow: var(--shadow-lg) !important;
+    border: 1px solid var(--border) !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    min-width: 220px;
+    max-width: 280px;
+}
+
+.leaflet-popup-tip-container { margin-top: -1px; }
+
+.popup-card { padding: 0.9rem 1rem; }
+.popup-card h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 0.3rem;
+}
+.popup-card .popup-location {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin: 0 0 0.6rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+}
+.popup-card .popup-desc {
+    font-size: 0.8rem;
+    color: var(--gray-700);
+    margin: 0 0 0.75rem;
+    line-height: 1.5;
+}
+.popup-card .popup-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+}
+.popup-card .popup-date {
+    font-size: 0.68rem;
+    color: var(--gray-500);
+    font-family: var(--font-mono);
+}
+
+
+/* =========================================================
+   TABLET — hasta 900px
+   ========================================================= */
+@media (max-width: 900px) and (min-width: 769px) {
+
+    .map-page-content {
+        width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 300px;
+        min-width: 300px;
+        max-width: 300px;
+
+        margin-left: 0;
+        margin-right: 0;
+
+        flex-shrink: 0;
+    }
+
+    .map-area {
+        width: auto;
+        min-width: 0;
+
+        margin-left: 0;
+        margin-right: 0;
+
+        flex: 1 1 auto;
+
+        position: relative;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+        min-height: 400px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE — hasta 768px
+   El documento completo hace scroll.
+   ========================================================= */
+@media (max-width: 768px) {
+
+    /* ---------------------------------------------------------
+       CONTENEDOR PRINCIPAL
+       --------------------------------------------------------- */
+
+    .map-page-content {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+        min-width: 0;
+
+        height: auto;
+        min-height: 0;
+
+        border-radius: var(--radius);
+        overflow: visible;
+    }
+
+
+    /* ---------------------------------------------------------
+       MAPA
+       --------------------------------------------------------- */
+
+    .map-area {
+        order: 1;
+
+        width: 100%;
+        min-width: 0;
+
+        height: 300px;
+        min-height: 300px;
+
+        flex: none;
+
+        /* Reset de posibles reglas de escritorio */
+        margin-left: 0;
+        margin-right: 0;
+
+        left: auto;
+        right: auto;
+    }
+
+    #map {
+        width: 100%;
+        height: 300px;
+        min-height: 300px;
+    }
+
+
+    /* ---------------------------------------------------------
+       SIDEBAR / REPORTES
+       --------------------------------------------------------- */
+
+    .sidebar {
+        order: 2;
+
+        position: static;
+
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+
+        margin-left: 0;
+        margin-right: 0;
+
+        max-height: none;
+        height: auto;
+        min-height: 0;
+
+        border-right: none;
+        border-top: 1px solid var(--border);
+
+        box-shadow: none;
+        backdrop-filter: none;
+        background: var(--surface);
+
+        overflow: visible;
+
+        flex: none;
+    }
+
+    /* ============================================================
+   IMAGEN EN POPUP DEL MAPA
+   ============================================================ */
+
+.popup-card {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.popup-image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+
+.popup-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.popup-content {
+    padding: 12px 14px;
+}
+
+.popup-content h4 {
+    margin: 0 0 8px;
+}
+
+.popup-location {
+    margin: 0 0 8px;
+}
+
+.popup-desc {
+    margin: 0 0 12px;
+}
+
+    /* ---------------------------------------------------------
+       LISTA DE REPORTES
+       Sin scroll interno en mobile
+       --------------------------------------------------------- */
+
+    .sidebar .reports-list,
+    .sidebar .report-list,
+    .sidebar .reports-container {
+        max-height: none;
+        height: auto;
+
+        overflow: visible;
+    }
+}

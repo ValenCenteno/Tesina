@@ -1,0 +1,284 @@
+/* =============================================================
+   CREAR REPORTE — formulario estilo SaaS moderno.
+   Misma paleta visual que el resto de CiudadActiva.
+   ============================================================= */
+
+.report-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 1.25rem;
+    margin: 1.75rem 0 3rem;
+    align-items: start;
+}
+
+/* =============================================================
+   TARJETA DEL FORMULARIO
+   ============================================================= */
+
+.report-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.report-header {
+    padding: 1.4rem 1.6rem 1.15rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.report-header h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+.report-header h2 i {
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+.report-header p {
+    color: var(--gray-500);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.report-body {
+    padding: 1.5rem 1.6rem 1.75rem;
+}
+
+/* =============================================================
+   BOTÓN DE ENVÍO
+   ============================================================= */
+
+.btn-submit {
+    width: 100%;
+    padding: 0.8rem;
+
+    background: var(--primary);
+    color: #fff;
+
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-sm);
+
+    font-size: 0.92rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s var(--ease),
+        border-color 0.15s var(--ease),
+        transform 0.15s var(--ease);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    margin-top: 0.4rem;
+
+    font-family: inherit;
+}
+
+.btn-submit:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-submit:active {
+    transform: translateY(1px);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =============================================================
+   ALERTA DEL FORMULARIO
+   ============================================================= */
+
+#formAlert .alert {
+    padding: 0.7rem 0.9rem;
+
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    border: 1px solid transparent;
+}
+
+#formAlert .alert-danger {
+    background: var(--danger-bg);
+    color: #991b1b;
+    border-color: var(--danger-border);
+}
+
+#formAlert .alert-success {
+    background: var(--success-bg);
+    color: #166534;
+    border-color: var(--success-border);
+}
+
+/* =============================================================
+   TARJETA DEL MINI MAPA
+   ============================================================= */
+
+.map-picker-card {
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    overflow: hidden;
+
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
+}
+
+.map-picker-header {
+    padding: 1.1rem 1.3rem 0.7rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.map-picker-header h3 {
+    font-size: 0.92rem;
+    font-weight: 600;
+
+    color: var(--ink);
+
+    margin: 0 0 0.2rem;
+
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.map-picker-header h3 i {
+    color: var(--primary);
+    font-size: 0.85rem;
+}
+
+.map-picker-header p {
+    font-size: 0.78rem;
+    color: var(--gray-500);
+    margin: 0;
+}
+
+#miniMap {
+    width: 100%;
+    height: 300px;
+
+    cursor: crosshair;
+
+    background: var(--gray-100);
+}
+
+/* =============================================================
+   COORDENADAS
+   ============================================================= */
+
+.coords-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding: 0.6rem 1.1rem;
+
+    background: var(--success-bg);
+    border-top: 1px solid var(--success-border);
+
+    font-size: 0.8rem;
+    color: var(--success);
+}
+
+.coords-display span {
+    flex: 1;
+}
+
+.clear-pin {
+    background: transparent;
+
+    border: 1px solid var(--primary);
+    color: var(--primary);
+
+    border-radius: var(--radius-sm);
+
+    padding: 0.2rem 0.6rem;
+
+    font-size: 0.73rem;
+
+    cursor: pointer;
+
+    transition: all 0.15s var(--ease);
+
+    font-family: inherit;
+}
+
+.clear-pin:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+/* =============================================================
+   AYUDA DEL MAPA
+   ============================================================= */
+
+.map-picker-hint {
+    font-size: 0.74rem;
+    color: var(--gray-500);
+
+    padding: 0.6rem 1.1rem;
+    margin: 0;
+
+    border-top: 1px solid var(--border);
+
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+}
+
+.map-picker-hint i {
+    color: var(--warning);
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* =============================================================
+   RESPONSIVE
+   ============================================================= */
+
+@media (max-width: 900px) {
+
+    .report-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .map-picker-card {
+        position: static;
+    }
+
+    #miniMap {
+        height: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .report-header {
+        padding: 1.1rem 1.2rem;
+    }
+
+    .report-body {
+        padding: 1.2rem;
+    }
+}

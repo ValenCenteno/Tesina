@@ -1,0 +1,334 @@
+/* =============================================================
+   CIUDADACTIVA — SOLUCIONES
+   Modal de registrar/editar solución + bloque "PROBLEMA
+   SOLUCIONADO" (popup del mapa) + botones asociados.
+   Usa las mismas variables del sistema de diseño (global.css),
+   así que funciona en modo claro y oscuro sin reglas extra.
+   ============================================================= */
+
+
+/* -------------------------------------------------------------
+   MODAL — overlay + caja
+   ------------------------------------------------------------- */
+
+.solution-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(2px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 1rem;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.18s var(--ease), visibility 0.18s var(--ease);
+}
+
+.solution-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.solution-modal {
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    transform: translateY(8px);
+    transition: transform 0.18s var(--ease);
+}
+
+.solution-modal-overlay.open .solution-modal {
+    transform: translateY(0);
+}
+
+.solution-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 1.1rem 1.3rem;
+    border-bottom: 1px solid var(--border);
+
+    flex-shrink: 0;
+}
+
+.solution-modal-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.solution-modal-header h3 i {
+    color: var(--success);
+}
+
+.solution-modal-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--gray-600);
+    font-size: 0.95rem;
+
+    transition: background 0.15s var(--ease);
+}
+
+.solution-modal-close:hover {
+    background: var(--gray-150);
+    color: var(--ink);
+}
+
+.solution-modal form {
+    padding: 1.2rem 1.3rem;
+    overflow-y: auto;
+}
+
+#solutionModalAlert {
+    padding: 0 1.3rem;
+}
+
+#solutionModalAlert .alert {
+    padding: 0.7rem 0.9rem;
+    border-radius: var(--radius-sm);
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+#solutionModalAlert .alert-danger {
+    background: var(--danger-bg);
+    color: var(--danger);
+    border-color: var(--danger-border);
+}
+
+#solutionModalAlert .alert-success {
+    background: var(--success-bg);
+    color: var(--success);
+    border-color: var(--success-border);
+}
+
+.solution-modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.solution-modal-actions-right {
+    display: flex;
+    gap: 0.6rem;
+    margin-left: auto;
+}
+
+
+/* -------------------------------------------------------------
+   BLOQUE "PROBLEMA SOLUCIONADO" (popup del mapa)
+   ------------------------------------------------------------- */
+
+.solution-block {
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+
+    border-top: 1px dashed var(--border);
+}
+
+.solution-block-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    color: var(--success);
+
+    margin-bottom: 0.5rem;
+}
+
+.solution-block-photo {
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.solution-block-photo img {
+    display: block;
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+}
+
+.solution-block-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+}
+
+.solution-block-desc {
+    font-size: 0.82rem;
+    color: var(--gray-700);
+    line-height: 1.45;
+    margin-bottom: 0.4rem;
+}
+
+.solution-block-date {
+    font-size: 0.76rem;
+    color: var(--gray-600);
+
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+
+/* -------------------------------------------------------------
+   BOTÓN "Registrar / Editar solución" (popup del mapa)
+   ------------------------------------------------------------- */
+
+.popup-solution-actions {
+    margin-top: 0.7rem;
+}
+
+.popup-solution-btn {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+
+    padding: 0.55rem 0.8rem;
+
+    background: var(--primary);
+    color: #ffffff;
+
+    border: none;
+    border-radius: var(--radius-sm);
+
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+
+    transition: background 0.15s var(--ease);
+}
+
+.popup-solution-btn:hover {
+    background: var(--primary-dark);
+}
+
+
+/* -------------------------------------------------------------
+   BOTÓN "Solución" en la tabla de admin
+   ------------------------------------------------------------- */
+
+.admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.solution-btn {
+    background: var(--primary-bg);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    padding: 0.42rem 0.75rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: inherit;
+    transition: all 0.15s var(--ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.solution-btn:hover {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+
+/* -------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------- */
+
+@media (max-width: 480px) {
+
+    .solution-modal {
+        max-height: 95vh;
+    }
+
+    .solution-modal-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .solution-modal-actions-right {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .solution-modal-actions-right .btn {
+        flex: 1;
+    }
+
+    #solutionDeleteBtn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+
+/* -------------------------------------------------------------
+   MODO OSCURO — refuerzos puntuales
+   (la mayoría ya funciona solo por usar variables, esto cubre
+   los pocos valores fijos que no vienen de una variable)
+   ------------------------------------------------------------- */
+
+[data-theme="dark"] .solution-modal-overlay {
+    background: rgba(0, 0, 0, 0.65);
+}
+
+[data-theme="dark"] .popup-solution-btn {
+    color: #0b1210;
+}
