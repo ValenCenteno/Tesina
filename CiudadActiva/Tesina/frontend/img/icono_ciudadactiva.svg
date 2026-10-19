@@ -1,0 +1,25 @@
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="pinGrad" x1="10%" y1="0%" x2="90%" y2="100%">
+            <stop offset="0%" stop-color="#2DD4BF"/>
+            <stop offset="100%" stop-color="#0F766E"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Pin / marcador -->
+    <path d="M50 6
+             C27 6 9 24 9 46
+             C9 74 50 97 50 97
+             C50 97 91 74 91 46
+             C91 24 73 6 50 6
+             Z"
+          fill="url(#pinGrad)"/>
+
+    <!-- Círculo blanco interior -->
+    <circle cx="50" cy="44" r="27" fill="#ffffff"/>
+
+    <!-- Skyline -->
+    <rect x="27" y="38" width="14" height="27" rx="1.5" fill="#5EEAD4"/>
+    <rect x="43" y="21" width="14" height="44" rx="1.5" fill="#115E59"/>
+    <rect x="59" y="42" width="14" height="23" rx="1.5" fill="#5EEAD4"/>
+</svg>

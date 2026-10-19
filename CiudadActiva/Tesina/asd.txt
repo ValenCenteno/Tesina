@@ -1,0 +1,39 @@
+6/4
+al volver a inicio desde mapa de reportes no funca /LISTO
+el panel de administracion no tiene nada /LISTO
+el mapa dice access blocked. Hay que ver si se puede solucionar /LISTO
+crear la base de datos /LISTO
+que cuando envies un reporte haga algo, que te avise o algo de eso. Estaria bueno que te vuelva al inicio /LISTO
+que el mapa se pueda ampliar o buscar direccion concreta algo de eso /LISTO
+el boton de buscar, por ahora esta al pedo o puede ser que no funka /LISTO
+volver al reporte no anda /LISTO
+al parecer ningun boton de volver al inicio anda /LISTO
+desde index no anda ni iniciar sesion ni registrarse /LISTO
+que el reporte en azaul arriba a la izquierda, desde el index no haga nada (que no sea boton) /LISTO
+hay 2 botones de registrarse, dejar 1. Ninguno anda /LISTO
+
+15/4
+los script tiene que estar separados /LISTO
+que los que no son administradores no puedan ver el panel de administracion /LISTO
+
+
+17/8
+
+- Agregar las fotos de las evidencias enviadas por los usuarios a la tabla de admin y el index. /LISTO
+- Agregar campo para las evidencias de que el problema se soluciono. 
+- Capaz cambiar mas drasticamente el diseño.
+- La ventana "Mapa" es mejorable. 
+- Agregar la foto como icono en la ventana. /LISTO
+- Ver si se puede hacer que la pagina funcione mas rapidamente.
+- Mejorar la verificacion del login. Cualquiera podria registarse con un nombre falso, si es una app municipal no puede pasar.
+    - Podria pedir DNI, Numero de telefono. /LISTO
+- El responsive es mejorable en "Mapa" y "Admin". /LISTO
+- Limitar el moviiento del mapa a unicamten rio terceros o pueblos cercanos.  /LISTO
+
+24/8
+
+-Bug en el apartado del mapa. Cuando aprieto un reporte, todas las "fichas" o "punteros" se ponenen con el mismo icono que tiene el reporte que se aprieta.
+
+26/8
+
+-Hacer que el administrador no pueda reportar problemas recientes
